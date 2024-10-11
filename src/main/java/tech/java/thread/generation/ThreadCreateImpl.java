@@ -16,7 +16,9 @@ public class ThreadCreateImpl {
     t2.start ();
     t2.join ();
 
-    System.out.println ("Worker 1 has finished work!!");
+    System.out.printf (
+        "Worker 1,worker 2 has finished work!!, executed by:: %s %s ", Thread.currentThread ()
+            .getName (), Thread.currentThread ().getPriority ());
 
   }
 }
@@ -38,7 +40,7 @@ class Worker1 implements Runnable {
       catch (InterruptedException e) {
         throw new RuntimeException (e);
       }
-      System.out.printf ("%s , %d printed by ------------> %s%n", name, i,
+      System.out.printf ("%s , %d printed by --------------> %s%n", name, i,
                          Thread.currentThread ().getName ()
                         );
     }
