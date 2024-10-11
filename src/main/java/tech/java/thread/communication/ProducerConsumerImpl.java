@@ -29,10 +29,9 @@ class Processor {
     synchronized (lock) {
       while (true) {
         if (queue.size () == capacity) {
-          System.out.println (
-              "\n**************** Product List is full, Consumer Can Consume now ! "
-              + Thread.currentThread ()
-                  .getName ());
+          System.out.println ("\n" + Thread.currentThread ().getName ()
+                              + "-- **************** Product List is full, Consumer Can Consume "
+                              + "now!\n");
           try {
             lock.wait ();
           }
@@ -45,9 +44,9 @@ class Processor {
           sleep (300);
           var productId = UUID.randomUUID ();
           queue.add (productId);
-          System.out.println (
-              "Added New ProductId- " + productId + ", by - " + Thread.currentThread ().getName ()
-              + ", Product List Size: " + queueSize);
+          System.out.println (Thread.currentThread ().getName () +
+                              "-- Added New ProductId- " + productId + ", Product List Size: " + (
+                                  queueSize + 1));
           lock.notify ();
         }
       }
@@ -68,9 +67,8 @@ class Processor {
       while (true) {
         if (queue.isEmpty ()) {
           System.out.println (
-              "\n****************** Product List is Empty, Producer Can Produce new batch "
-              + Thread.currentThread ()
-                  .getName ());
+              "\n" + Thread.currentThread ().getName ()
+              + "-- ****************** Product List is Empty, Producer Can Produce new batch\n");
           try {
             lock.wait ();
           }
@@ -82,9 +80,9 @@ class Processor {
           var queueSize = queue.size ();
           sleep (200);
           var productId = queue.remove ();
-          System.out.println (
-              "Consumed New ProductId- " + productId + " by - " + Thread.currentThread ()
-                  .getName () + ", Product List Size: " + queueSize);
+          System.out.println (Thread.currentThread ().getName () +
+                              "--Consumed New ProductId- " + productId
+                              + ", Product List Size: " + (queueSize - 1));
           lock.notify ();
         }
       }
