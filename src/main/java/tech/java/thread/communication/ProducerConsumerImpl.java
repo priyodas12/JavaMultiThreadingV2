@@ -1,8 +1,8 @@
 package tech.java.thread.communication;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class ProducerConsumerImpl {
 
@@ -22,14 +22,13 @@ public class ProducerConsumerImpl {
 class Processor {
 
   final Object lock = new Object ();
-  List<UUID> productIdList = new ArrayList<> ();
-  int upper_limit = 10;
-  int lower_limit = 1;
+  int capacity = 10;
+  BlockingQueue<UUID> queue = new ArrayBlockingQueue<> (capacity);
 
   public void produce () {
     synchronized (lock) {
       while (true) {
-        if (productIdList.size () == upper_limit) {
+        if (queue.size () == capacity) {
           System.out.println (
               "\n**************** Product List is full, Consumer Can Consume now ! "
               + Thread.currentThread ()
@@ -42,12 +41,13 @@ class Processor {
           }
         }
         else {
+          var queueSize = queue.size ();
           sleep (300);
           var productId = UUID.randomUUID ();
-          productIdList.add (productId);
+          queue.add (productId);
           System.out.println (
               "Added New ProductId- " + productId + ", by - " + Thread.currentThread ().getName ()
-              + ", Product List Size: " + productIdList.size ());
+              + ", Product List Size: " + queueSize);
           lock.notify ();
         }
       }
@@ -66,7 +66,7 @@ class Processor {
   public void consume () {
     synchronized (lock) {
       while (true) {
-        if (productIdList.size () == lower_limit) {
+        if (queue.isEmpty ()) {
           System.out.println (
               "\n****************** Product List is Empty, Producer Can Produce new batch "
               + Thread.currentThread ()
@@ -79,11 +79,12 @@ class Processor {
           }
         }
         else {
+          var queueSize = queue.size ();
           sleep (200);
-          var productId = productIdList.removeLast ();
+          var productId = queue.remove ();
           System.out.println (
               "Consumed New ProductId- " + productId + " by - " + Thread.currentThread ()
-                  .getName () + ", Product List Size: " + productIdList.size ());
+                  .getName () + ", Product List Size: " + queueSize);
           lock.notify ();
         }
       }
