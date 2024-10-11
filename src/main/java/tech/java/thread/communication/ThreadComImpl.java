@@ -4,8 +4,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadComImpl {
 
-  public static int counter = 0;
-
+  private static int counter1 = 0;
+  private static int counter2 = 0;
 
   public static void main (String[] args) {
     AtomicInteger atomicInteger = new AtomicInteger (0);
@@ -13,25 +13,19 @@ public class ThreadComImpl {
   }
 
   public static void process (AtomicInteger atomicInteger) {
-    Thread t1 = new Thread (new Runnable () {
-      @Override
-      public void run () {
-        for (int i = 0; i < 10000; i++) {
-          counter++;
-          atomicInteger.getAndIncrement ();
-          //System.out.printf ("%s , %s", i, Thread.currentThread ().getName ());
-        }
+    Thread t1 = new Thread (() -> {
+      for (int i = 0; i < 10000; i++) {
+        increment1 ();
+        atomicInteger.getAndIncrement ();
+        //System.out.printf ("<%d ---> %s>%n", i, Thread.currentThread ().getName ());
       }
     });
 
-    Thread t2 = new Thread (new Runnable () {
-      @Override
-      public void run () {
-        for (int i = 0; i < 10000; i++) {
-          counter++;
-          atomicInteger.getAndIncrement ();
-          //System.out.printf ("%s , %s", i, Thread.currentThread ().getName ());
-        }
+    Thread t2 = new Thread (() -> {
+      for (int i = 0; i < 10000; i++) {
+        increment2 ();
+        atomicInteger.getAndIncrement ();
+        //System.out.printf ("<%d ---> %s>%n", i, Thread.currentThread ().getName ());
       }
     });
 
@@ -46,9 +40,20 @@ public class ThreadComImpl {
       throw new RuntimeException (e);
     }
     finally {
-      System.out.println ("FINAL VALUE OF COUNTER:: " + counter);
+      System.out.println ("FINAL VALUE OF COUNTER1:: " + counter1);
+      System.out.println ("FINAL VALUE OF COUNTER2:: " + counter2);
       System.out.println ("FINAL VALUE OF ATOMIC COUNTER:: " + atomicInteger.get ());
-      System.out.println ("EXECUTION FINISHED :: " + Thread.currentThread ().getName ());
+      System.out.println (
+          "EXECUTION FINISHED :: " + Thread.currentThread ().getName ().toUpperCase ());
     }
+
+  }
+
+  private static synchronized void increment1 () {
+    counter1++;
+  }
+
+  private static void increment2 () {
+    counter2++;
   }
 }
